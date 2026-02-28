@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Our Memories</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Inter:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ===========================
+       RESET & BASE STYLES
+    =========================== */
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #fff0f3 0%, #ffc2d1 100%);
+      background-attachment: fixed;
+      color: #4a0e1e;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    /* Floating Hearts */
+    #heartsContainer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .heart {
+      position: absolute;
+      bottom: -30px;
+      color: #ff4d6d;
+      font-size: 24px;
+      animation: floatUp linear forwards, sway ease-in-out infinite alternate;
+      opacity: 0.6;
+      filter: drop-shadow(0 0 5px rgba(255, 77, 109, 0.4));
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 0.8;
+      }
+
+      90% {
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: translateY(-120vh);
+        opacity: 0;
+      }
+    }
+
+    @keyframes sway {
+      0% {
+        margin-left: -20px;
+      }
+
+      100% {
+        margin-left: 20px;
+      }
+    }
+
+    /* ===========================
+       PAGE SECTIONS
+    =========================== */
+    .page {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      min-height: 100vh;
+      width: 100%;
+      position: relative;
+      z-index: 10;
+    }
+
+    .page.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .page.visible {
+      opacity: 1;
+    }
+
+    /* ===========================
+       TYPOGRAPHY & ELEMENTS
+    =========================== */
+    h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: #c9184a;
+      text-shadow: 2px 2px 4px rgba(201, 24, 74, 0.1);
+    }
+
+    p {
+      color: #590d22;
+      line-height: 1.6;
+      font-size: 1.05rem;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    /* ===========================
+       1. LOCK SCREEN
+    =========================== */
+    .lock-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 20px;
+      padding: 48px 40px;
+      text-align: center;
+      max-width: 380px;
+      width: 90%;
+      box-shadow: 0 10px 40px rgba(201, 24, 74, 0.15);
+    }
+
+    .lock-card h1 {
+      font-size: 2.8rem;
+    }
+
+    .lock-card p.subtitle {
+      margin-bottom: 32px;
+      font-size: 1rem;
+      color: #a4133c;
+      font-weight: 500;
+    }
+
+    .pin-input {
+      width: 100%;
+      padding: 16px;
+      font-size: 1.75rem;
+      letter-spacing: 16px;
+      text-align: center;
+      border: 2px solid #ffb3c6;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #c9184a;
+      outline: none;
+      margin-bottom: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .pin-input:focus {
+      border-color: #c9184a;
+      box-shadow: 0 0 15px rgba(201, 24, 74, 0.2);
+    }
+
+    .pin-input.error {
+      border-color: #ef4444;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      20%,
+      60% {
+        transform: translateX(-6px);
+      }
+
+      40%,
+      80% {
+        transform: translateX(6px);
+      }
+    }
+
+    .error-msg {
+      color: #ef4444;
+      font-size: 0.85rem;
+      min-height: 20px;
+      margin-bottom: 24px;
+      opacity: 0;
+      transition: opacity 0.2s;
+      font-weight: 500;
+    }
+
+    .error-msg.show {
+      opacity: 1;
+    }
+
+    .unlock-btn {
+      width: 100%;
+      padding: 16px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ff4d6d 0%, #c9184a 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(201, 24, 74, 0.3);
+    }
+
+    .unlock-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(201, 24, 74, 0.4);
+    }
+
+    .hint {
+      margin-top: 24px;
+      font-size: 0.85rem;
+      color: #ff8fa3;
+    }
+
+    /* ===========================
+       2. MESSAGE PAGE
+    =========================== */
+    #messagePage {
+      padding: 40px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Full-cover background video */
+    #msgBgVideo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      transform: translate(-50%, -50%);
+      object-fit: cover;
+      z-index: 0;
+      opacity: 0.55;
+    }
+
+    /* Dark overlay so card text stays readable */
+    .msg-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(60, 0, 20, 0.45);
+      z-index: 1;
+    }
+
+    .message-content {
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(14px);
+      border-radius: 24px;
+      padding: 50px 40px;
+      text-align: center;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 10px 40px rgba(201, 24, 74, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      position: relative;
+      z-index: 2;
+    }
+
+    .message-content h1 {
+      margin-bottom: 16px;
+    }
+
+    .message-content p {
+      font-size: 1.15rem;
+      color: #590d22;
+      margin-bottom: 40px;
+    }
+
+    .memories-btn {
+      padding: 14px 36px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: 2px solid transparent;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #ff4d6d 0%, #c9184a 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(201, 24, 74, 0.3);
+    }
+
+    .memories-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(201, 24, 74, 0.4);
+    }
+
+    /* ===========================
+       3. GALLERY PAGE
+    =========================== */
+    #galleryPage {
+      padding: 80px 20px 60px;
+      justify-content: flex-start;
+    }
+
+    .gallery-header {
+      text-align: center;
+      margin-bottom: 56px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 20px 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(255, 179, 198, 0.2);
+    }
+
+    .gallery-header h1 {
+      margin-bottom: 8px;
+    }
+
+    .gallery-header p {
+      color: #800f2f;
+      font-weight: 500;
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 40px;
+      max-width: 1000px;
+      width: 100%;
+      margin: 0 auto;
+      padding-bottom: 40px;
+    }
+
+    .photo-item {
+      background: #fff;
+      padding: 14px 14px 50px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      border-radius: 4px;
+      position: relative;
+      opacity: 0;
+      animation: fadeInUp 0.5s ease forwards;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Polaroid rotations */
+    .photo-item:nth-child(1) {
+      transform: rotate(-2deg);
+      animation-delay: 0.1s;
+    }
+
+    .photo-item:nth-child(2) {
+      transform: rotate(3deg);
+      animation-delay: 0.2s;
+    }
+
+    .photo-item:nth-child(3) {
+      transform: rotate(-4deg);
+      animation-delay: 0.3s;
+    }
+
+    .photo-item:nth-child(4) {
+      transform: rotate(2deg);
+      animation-delay: 0.4s;
+    }
+
+    .photo-item:nth-child(5) {
+      transform: rotate(-3deg);
+      animation-delay: 0.5s;
+    }
+
+    .photo-item:nth-child(6) {
+      transform: rotate(1deg);
+      animation-delay: 0.6s;
+    }
+
+    .photo-item:nth-child(7) {
+      transform: rotate(4deg);
+      animation-delay: 0.7s;
+    }
+
+    .photo-item:nth-child(8) {
+      transform: rotate(-1deg);
+      animation-delay: 0.8s;
+    }
+
+    .photo-item:nth-child(9) {
+      transform: rotate(2deg);
+      animation-delay: 0.9s;
+    }
+
+    .photo-item:nth-child(10) {
+      transform: rotate(-3deg);
+      animation-delay: 1.0s;
+    }
+
+    .photo-item:nth-child(11) {
+      transform: rotate(3deg);
+      animation-delay: 1.1s;
+    }
+
+    .photo-item:nth-child(12) {
+      transform: rotate(-2deg);
+      animation-delay: 1.2s;
+    }
+
+    .photo-item:nth-child(13) {
+      transform: rotate(2deg);
+      animation-delay: 1.3s;
+    }
+
+    .photo-item:nth-child(14) {
+      transform: rotate(-3deg);
+      animation-delay: 1.4s;
+    }
+
+    .photo-item:nth-child(15) {
+      transform: rotate(1deg);
+      animation-delay: 1.5s;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        margin-top: 30px;
+      }
+
+      to {
+        opacity: 1;
+        margin-top: 0;
+      }
+    }
+
+    .photo-item img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      background-color: #fce4ec;
+      border: 1px solid #f8bbd0;
+    }
+
+    .photo-item:hover {
+      transform: scale(1.08) rotate(0deg) !important;
+      z-index: 20;
+      box-shadow: 0 20px 40px rgba(201, 24, 74, 0.2);
+    }
+
+    .photo-item .caption {
+      position: absolute;
+      bottom: 12px;
+      left: 0;
+      width: 100%;
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.5rem;
+      color: #800f2f;
+      text-align: center;
+    }
+
+    /* ---- NAVIGATION ---- */
+    .top-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 24px;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    .nav-btn {
+      padding: 10px 20px;
+      font-size: 1rem;
+      font-weight: 500;
+      border: none;
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #c9184a;
+      pointer-events: auto;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(201, 24, 74, 0.15);
+    }
+
+    .nav-btn:hover {
+      background: #c9184a;
+      color: #fff;
+    }
+
+    #backBtn {
+      display: none;
+    }
+
+    .music-toggle {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #ff4d6d 0%, #c9184a 100%);
+      color: #ffffff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      z-index: 50;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 25px rgba(201, 24, 74, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .music-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 10px 30px rgba(201, 24, 74, 0.4);
+    }
+
+    /* ===========================
+       RESPONSIVE — TABLET
+    =========================== */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 3rem;
+      }
+
+      .lock-card {
+        max-width: 340px;
+        padding: 36px 24px;
+      }
+
+      .message-content {
+        padding: 36px 24px;
+        max-width: 95%;
+      }
+
+      .photo-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 28px;
+        padding: 0 12px 40px;
+      }
+
+      .gallery-header {
+        padding: 16px 24px;
+      }
+
+      .music-toggle {
+        bottom: 16px;
+        right: 16px;
+        width: 48px;
+        height: 48px;
+        font-size: 1.3rem;
+      }
+    }
+
+    /* ===========================
+       RESPONSIVE — SMALL MOBILE
+    =========================== */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2.6rem;
+      }
+
+      .lock-card {
+        padding: 30px 18px;
+        width: 92%;
+        border-radius: 16px;
+      }
+
+      .lock-card h1 {
+        font-size: 2.2rem;
+      }
+
+      .lock-card p.subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+      }
+
+      .pin-input {
+        font-size: 1.5rem;
+        letter-spacing: 12px;
+        padding: 14px;
+      }
+
+      .unlock-btn {
+        padding: 14px;
+        font-size: 0.95rem;
+      }
+
+      .error-msg {
+        font-size: 0.82rem;
+      }
+
+      .message-content {
+        padding: 28px 16px;
+        border-radius: 16px;
+      }
+
+      .message-content h1 {
+        font-size: 2.2rem;
+      }
+
+      .message-content p {
+        font-size: 0.97rem;
+        margin-bottom: 28px;
+        line-height: 1.65;
+      }
+
+      .memories-btn {
+        padding: 12px 28px;
+        font-size: 0.95rem;
+      }
+
+      .photo-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        padding: 0 16px 40px;
+        max-width: 360px;
+        margin: 0 auto;
+      }
+
+      .photo-item {
+        border-radius: 4px;
+      }
+
+      .photo-item .caption {
+        font-size: 1.3rem;
+      }
+
+      .gallery-header {
+        padding: 14px 20px;
+        margin-bottom: 32px;
+      }
+
+      .gallery-header h1 {
+        font-size: 2rem;
+      }
+
+      #galleryPage {
+        padding: 70px 12px 50px;
+      }
+
+      .top-nav {
+        padding: 14px 16px;
+      }
+
+      .nav-btn {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+      }
+
+      .music-toggle {
+        bottom: 12px;
+        right: 12px;
+        width: 44px;
+        height: 44px;
+        font-size: 1.2rem;
+      }
+    }
+
+    /* ===========================
+       RESPONSIVE — TINY PHONES
+    =========================== */
+    @media (max-width: 380px) {
+      h1 {
+        font-size: 2.2rem;
+      }
+
+      .lock-card {
+        padding: 24px 14px;
+        width: 95%;
+      }
+
+      .pin-input {
+        font-size: 1.3rem;
+        letter-spacing: 10px;
+      }
+
+      .message-content {
+        padding: 22px 12px;
+      }
+
+      .message-content p {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Floating Hearts Container -->
+  <div id="heartsContainer"></div>
+
+  <!-- =====================================================
+       TOP NAV
+  ====================================================== -->
+  <div class="top-nav">
+    <button id="backBtn" class="nav-btn" onclick="showPage('messagePage')">
+      <span>←</span> Back
+    </button>
+  </div>
+
+  <!-- =====================================================
+       PAGE 1: LOCK SCREEN
+  ====================================================== -->
+  <section id="lockScreen" class="page active visible">
+    <div class="lock-card">
+      <h1>Private Access</h1>
+      <p class="subtitle">Enter our secret PIN</p>
+
+      <div class="pin-wrapper">
+        <input type="password" id="pinInput" class="pin-input" maxlength="4" inputmode="numeric" placeholder="••••"
+          autocomplete="off" />
+      </div>
+
+      <p id="errorMsg" class="error-msg">Incorrect PIN</p>
+
+      <button id="unlockBtn" class="unlock-btn" onclick="attemptUnlock()">
+        Unlock My Heart
+      </button>
+
+      <p class="hint">Hint: Our special number</p>
+    </div>
+  </section>
+
+  <!-- =====================================================
+       PAGE 2: MESSAGE PAGE
+  ====================================================== -->
+  <section id="messagePage" class="page">
+    <!-- Background video -->
+    <video id="msgBgVideo" autoplay muted loop playsinline preload="auto">
+      <source src="bg-vid.mp4" type="video/mp4">
+    </video>
+    <!-- Dark overlay -->
+    <div class="msg-overlay"></div>
+    <div class="message-content">
+      <h1>Heyyy my Love,</h1>
+      <p>Ayushiii!! Hahaha you got it….<br>
+        I know now we’re just friends but I have very precious gift which is give by and you know it ke su che. <br>
+        Hu aa gift ne nathi rakhi sakto that’s why i was return it ane aem naa samjish ke hu badhu aapi rahyo chu aetle
+        tari pase thi b hu Aej expect karu ke tu b mane aap I didn’t want anything from you!!! Please mane nathi joitu
+        ae je me aapyu tane…
+        I wish ke tane have tane saru lage mara vagar and tane hurt b naa thai have vadhare
+        and aa break up hu aetle kari rahyo chu ke tane shanti made, maro load naa re, ane
+        tane have hurt b naa thai vadhare becuase have koi b expectatio j nai hoi tane
+        as a partner ni mara jode thi... Haa tu as a friend tari ke ni rakhi saku chu mara pase
+        thi. Hu taro friend chu aetle koi b help joiti hoi toh mane call karje hu karish ae help.<br>
+        And biju ae ke tane have mara logicless vaato nai sambhdvi pade ane main ae ke mara
+        silly jokes b nai sambhdva pade...hahahahah....<br>
+        Thank you ayushi for accept these thing….<br>
+        I love you bebooo🩷💗💖🫂
+      </p>
+      <button class="memories-btn" onclick="showPage('galleryPage')">
+        View Our Memories
+      </button>
+    </div>
+  </section>
+
+  <!-- =====================================================
+       PAGE 3: MEMORY GALLERY
+  ====================================================== -->
+  <section id="galleryPage" class="page">
+    <div class="gallery-header">
+      <h1>Our Sweet Memories</h1>
+      <p>hahahah look🥺</p>
+    </div>
+
+    <div class="photo-grid">
+      <div class="photo-item">
+        <img src="2.jpeg" alt="Memory" loading="lazy" />
+        <span class="caption">First Met!!</span>
+      </div>
+
+      <div class="photo-item">
+        <img src="1.jpeg" alt="Memory" loading="lazy" />
+        <span class="caption">YJHD</span>
+      </div>
+
+      <div class="photo-item">
+        <img src="3.jpeg" alt="Memory" loading="lazy" />
+        <span class="caption">Pittzaa</span>
+      </div>
+
+      <div class="photo-item">
+        <img src="4.jpeg" alt="Memory" loading="lazy" />
+        <span class="caption">First Festival</span>
+      </div>
+
+      <div class="photo-item">
+        <img src="5.jpeg" alt="Memory" loading="lazy" />
+        <span class="caption">Selfieee</span>
+      </div>
+
+      <div class="photo-item">
+        <img src="6.jpeg" alt="Memory" loading="lazy" />
+        <span class="caption">Reception</span>
+      </div>
+
+      <div class="photo-item">
+        <img src="7.jpeg" alt="Memory" loading="lazy" />
+        <span class="caption">Wedding</span>
+      </div>
+
+      <div class="photo-item">
+        <img src="8.jpeg" alt="Memory" loading="lazy" />
+        <span class="caption">College Night</span>
+      </div>
+
+      <div class="photo-item">
+        <img src="9.jpeg" alt="Memory" loading="lazy" />
+        <span class="caption">Traniee</span>
+      </div>
+
+      <div class="photo-item">
+        <img src="10.jpeg" alt="Memory" loading="lazy" />
+        <span class="caption">Homee</span>
+      </div>
+
+      <div class="photo-item">
+        <img src="11.jpeg" alt="Memory" loading="lazy" />
+        <span class="caption">Temple</span>
+      </div>
+
+      <div class="photo-item">
+        <img src="12.jpeg" alt="Memory" loading="lazy" />
+        <span class="caption">Walkies</span>
+      </div>
+
+      <div class="photo-item">
+        <img src="13.jpeg" alt="Memory" loading="lazy" />
+        <span class="caption">Simple Posess</span>
+      </div>
+
+      <div class="photo-item">
+        <img src="15.jpeg" alt="Memory" loading="lazy" />
+        <span class="caption">Golo</span>
+      </div>
+
+      <div class="photo-item">
+        <img src="14.jpeg" alt="Memory" loading="lazy" />
+        <span class="caption">café</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================
+       MUSIC TOGGLE BUTTON
+  ====================================================== -->
+  <button id="musicToggle" class="music-toggle" onclick="toggleMusic()" title="Toggle music">
+    🎵
+  </button>
+
+  <audio id="bgMusic" loop preload="none">
+    <source src="yellow.mp3" type="audio/mpeg" />
+  </audio>
+
+  <!-- =====================================================
+       JAVASCRIPT
+  ====================================================== -->
+  <script>
+    const correctPin = "4008";
+
+    const pinInput = document.getElementById('pinInput');
+    const errorMsg = document.getElementById('errorMsg');
+    const musicToggle = document.getElementById('musicToggle');
+    const backBtn = document.getElementById('backBtn');
+    const bgMusic = document.getElementById('bgMusic');
+
+    let isMusicPlaying = false;
+
+    // Floating Hearts Animation
+    function createHeart() {
+      const container = document.getElementById('heartsContainer');
+      if (!container) return;
+
+      const heart = document.createElement('div');
+      heart.classList.add('heart');
+
+      // Randomly pick a heart symbol or romantic emoji
+      const emojis = ['❤️', '🌷', '💖', '🌻', '💕', '🫂', '💗', '✨', '💝'];
+      heart.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+
+      const size = Math.random() * 20 + 15;
+      heart.style.fontSize = `${size}px`;
+      heart.style.left = `${Math.random() * 100}vw`;
+
+      const duration = Math.random() * 4 + 5; // 5-9 seconds
+      const swayDuration = Math.random() * 2 + 2; // 2-4 seconds
+      heart.style.animationDuration = `${duration}s, ${swayDuration}s`;
+
+      container.appendChild(heart);
+
+      setTimeout(() => {
+        heart.remove();
+      }, duration * 1000);
+    }
+
+    // Start floating hearts
+    setInterval(createHeart, 600);
+    for (let i = 0; i < 5; i++) {
+      setTimeout(createHeart, i * 200); // initial burst
+    }
+
+    // Show/hide sections with fade
+    function showPage(pageId) {
+      const pages = document.querySelectorAll('.page');
+
+      pages.forEach(page => {
+        if (page.classList.contains('visible')) {
+          page.classList.remove('visible');
+
+          setTimeout(() => {
+            page.classList.remove('active');
+
+            const target = document.getElementById(pageId);
+            target.classList.add('active');
+
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                target.classList.add('visible');
+                window.scrollTo(0, 0);
+              });
+            });
+
+            // Handle UI elements visibility
+            if (pageId === 'lockScreen') {
+              musicToggle.style.display = 'none';
+              backBtn.style.display = 'none';
+            } else if (pageId === 'messagePage') {
+              musicToggle.style.display = 'flex';
+              backBtn.style.display = 'none';
+            } else if (pageId === 'galleryPage') {
+              musicToggle.style.display = 'flex';
+              backBtn.style.display = 'inline-flex';
+            }
+          }, 600); // matches CSS transition
+        }
+      });
+    }
+
+    function attemptUnlock() {
+      const enteredPin = pinInput.value.trim();
+
+      if (enteredPin === correctPin) {
+        errorMsg.classList.remove('show');
+        pinInput.classList.remove('error');
+        showPage('messagePage');
+      } else {
+        errorMsg.classList.add('show');
+        pinInput.classList.add('error');
+
+        setTimeout(() => {
+          pinInput.classList.remove('error');
+        }, 400);
+      }
+    }
+
+    pinInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        attemptUnlock();
+      }
+    });
+
+    pinInput.addEventListener('input', () => {
+      const val = pinInput.value;
+      const labels = ['1st', '2nd', '3rd', '4th'];
+
+      if (val.length === 0) {
+        errorMsg.classList.remove('show');
+        pinInput.classList.remove('error');
+        return;
+      }
+
+      // Find the first wrong digit left→right
+      let firstWrong = -1;
+      for (let i = 0; i < val.length; i++) {
+        if (val[i] !== correctPin[i]) { firstWrong = i; break; }
+      }
+
+      if (firstWrong === -1) {
+        // All typed digits correct so far
+        pinInput.classList.remove('error');
+        errorMsg.style.color = '#c9184a';
+        errorMsg.textContent = `${labels[val.length - 1]} digit is right ✅`;
+        errorMsg.classList.add('show');
+        // Auto-unlock on full correct PIN
+        if (val.length === 4) setTimeout(() => showPage('messagePage'), 800);
+      } else {
+        // Wrong digit
+        pinInput.classList.add('error');
+        setTimeout(() => pinInput.classList.remove('error'), 400);
+        errorMsg.style.color = '#ef4444';
+        errorMsg.textContent = `${labels[firstWrong]} digit is wrong ❌`;
+        errorMsg.classList.add('show');
+      }
+    });
+
+    function toggleMusic() {
+      if (isMusicPlaying) {
+        bgMusic.pause();
+        musicToggle.innerHTML = '🎵';
+      } else {
+        bgMusic.play().catch(() => {
+          console.log('Audio playback blocked');
+        });
+        musicToggle.innerHTML = '🔇';
+      }
+      isMusicPlaying = !isMusicPlaying;
+    }
+
+    // --- Auto-play music on page open ---
+    // Browsers block silent autoplay; we attempt immediately AND on first touch/click
+    function startMusic() {
+      if (!isMusicPlaying) {
+        bgMusic.volume = 0.5;
+        bgMusic.play().then(() => {
+          isMusicPlaying = true;
+          musicToggle.innerHTML = '🔇';
+        }).catch(() => { });
+      }
+    }
+
+    // Try immediately (works in some browsers / local files)
+    window.addEventListener('DOMContentLoaded', () => {
+      pinInput.focus();
+      startMusic();
+    });
+
+    // Fallback: start on very first user interaction
+    ['click', 'keydown', 'touchstart'].forEach(evt => {
+      document.addEventListener(evt, function handler() {
+        startMusic();
+        document.removeEventListener(evt, handler);
+      }, { once: true });
+    });
+  </script>
+</body>
+
+</html>
